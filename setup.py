@@ -15,6 +15,6 @@ setup(
     author='Bernd Strebel',
     author_email='b.strebel@digitec.de',
     description='Python Utilities Package',
-    long_description=open('README.md').read(),
-    install_requires=['requests']
+    long_description=open('README.md').read()
+    #install_requires=['requests']
 )
