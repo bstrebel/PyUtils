@@ -1,19 +1,21 @@
 import os, sys, logging
 
-__version__ = '0.1.4'
+__version__ = '0.2.0'
 __license__ = 'GPL2'
 __author__ = 'Bernd Strebel'
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-from .logutils import LogFileHandler, LogAdapter, ConsoleLogger
+from .logutils import LogFileHandler, LogAdapter, get_logger, log_level
 from .timeutils import strflocal
+from .optutils import Options
 
 __all__ = [
 
     'LogAdapter',
     'LogFileHandler',
-    'ConsoleLogger',
-    'strflocal'
+    'get_logger',
+    'log_level',
+    'strflocal',
+    'Options'
 ]
-
