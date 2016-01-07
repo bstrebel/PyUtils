@@ -22,7 +22,7 @@ def main():
                         help='debug log level')
 
     args = parser.parse_args()
-    opts = Options('TEST', args, options)
+    opts = Options(options, args, config=True)
 
 #    _logger = get_logger('root',log_level(opts.loglevel))
 #    logger = LogAdapter(_logger, {'package': 'init'})
@@ -60,6 +60,10 @@ def main():
 
     logger.info('Default logger configured from %s' % (opts.config_file))
     print opts.option
+
+    s = opts.get('string_option', bool, False)
+    pass
+    #f = Options.get_bool_value(opt)
 
 # region __Main__
 
