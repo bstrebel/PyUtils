@@ -12,7 +12,7 @@ class Options(object):
 
         self._options = options
         self._args = args
-        self._opts = vars(args)
+        self._opts = vars(args) if args is not None else {}
         self._prefix = prefix
         self._config = config
         self._config_path = config_path
@@ -53,9 +53,14 @@ class Options(object):
         if self._config is not None:
             if self._config_file is None:
                 # check args and default from options
-                self._config_file = self.__getitem__('config')
-                if self._config_file:
-                    self._config_file = os.path.expanduser(self._config_file)
+                if isinstance(self._config, str):
+                    if self._config.startswith('['):
+                        key = self._config[1:-1]
+                        self._config_file = self.__getitem__(key)
+                    else:
+                        self.config_file = self._config
+                    if self._config_file:
+                        self._config_file = os.path.expanduser(self._config_file)
                 else:
                     # calculate config file name from patch and script name
                     for path in self._config_path:
@@ -72,6 +77,7 @@ class Options(object):
             if self._config_parser is None:
                 if self.config_file and os.path.isfile(self.config_file):
                     self._config_parser = ConfigParser(self._options)
+                    self._config_parser.optionxform = str
                     self._config_parser.read(self.config_file)
         return self._config_parser
 
@@ -85,21 +91,29 @@ class Options(object):
             self._logger.setLevel(log_level(self.__getitem__('loglevel')))
         return self._logger
 
-    def get(self, key, type=str, default=None):
+    def get(self, key, default=None, type=str):
+
+        # required to restore shadowed __builtin__.type()
+        import __builtin__
+
+        if default is not None:
+            _type = __builtin__.type(default)
+        else:
+            _type = type
 
         val = self.__getitem__(key)
 
-        if val:
+        if val is not None:
 
             try:
                 if isinstance(val, str):
-                    if type is str:
+                    if _type is str:
                         return val
-                    elif type is int:
+                    elif _type is int:
                         return int(val)
-                    elif type is float:
+                    elif _type is float:
                         return float(val)
-                    elif type is bool:
+                    elif _type is bool:
                         if val.lower() in ['true', 'on', 'yes', '1']:
                             return True
                         elif val.lower() in ['false', 'off', 'no', '0']:
@@ -112,13 +126,13 @@ class Options(object):
                         pass
 
                 elif isinstance(val, int):
-                    if type is int:
+                    if _type is int:
                         return val
-                    elif type is float:
+                    elif _type is float:
                         return float(val)
-                    elif type is str:
+                    elif _type is str:
                         return str(val)
-                    elif type is bool:
+                    elif _type is bool:
                         if val == 0:
                             return False
                         else:
@@ -128,16 +142,16 @@ class Options(object):
                         pass
 
                 elif isinstance(val, bool):
-                    if type is bool:
+                    if _type is bool:
                         return val
-                    elif type is str:
+                    elif _type is str:
                         return str(val)
-                    elif type is int:
+                    elif _type is int:
                         if val == True:
                             return 1
                         else:
                             return 0
-                    elif type is float:
+                    elif _type is float:
                         if val == True:
                             return float(1)
                         else:

@@ -8,6 +8,7 @@ def main():
 
     options = {
         'option': 'OPTION',
+        'secrets': {'token': 'secret'},
         'loglevel': 'INFO'
     }
 
@@ -61,7 +62,8 @@ def main():
     logger.info('Default logger configured from %s' % (opts.config_file))
     print opts.option
 
-    s = opts.get('string_option', bool, False)
+    s = opts.get('string_option', False)
+    t = opts['secrets']['token']
     pass
     #f = Options.get_bool_value(opt)
 
