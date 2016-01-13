@@ -168,3 +168,6 @@ class Options(object):
 
         # not found error
         return default
+
+    def update(self, options):
+        self._options.update(options)
