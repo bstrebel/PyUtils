@@ -5,7 +5,15 @@ import os, sys, time
 
 def strflocal(tm=None, format='%Y-%m-%d %H:%M:%S'):
 
-    if not tm:
+    if format == None:
+        if tm is None:
+            return 'None'
+        elif tm == 0:
+            return '0'
+        else:
+            format = '%Y-%m-%d %H:%M:%S'
+
+    if tm is None:
         tm = time.time()
 
     # convert floating point to int/long
