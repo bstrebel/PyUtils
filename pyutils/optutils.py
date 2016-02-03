@@ -10,12 +10,13 @@ class Options(object):
 
     def __init__(self, options={}, args=None, config=None, config_path=['./', '~/.', '/etc/'], prefix=None):
 
-        self._options = options
-        self._args = args
-        self._opts = vars(args) if args is not None else {}
-        self._prefix = prefix
-        self._config = config
-        self._config_path = config_path
+        self._options = options                                 # default options
+        self._args = args                                       # namespace from argparser
+        self._opts = vars(args) if args is not None else {}     # command line args e.g. --config=...
+        self._prefix = prefix                                   # environment vars PREFEX_
+        self._config = config                                   # config filename or [key] to search in opts/vars
+        self._config_path = config_path                         # config file search path
+
         self._config_file = None
         self._config_parser = None
         self._logger = None
@@ -58,11 +59,12 @@ class Options(object):
                         key = self._config[1:-1]
                         self._config_file = self.__getitem__(key)
                     else:
-                        self.config_file = self._config
-                    if self._config_file:
-                        self._config_file = os.path.expanduser(self._config_file)
+                        self._config_file = self._config
+                    # single filename or comma separted list of names
+                    # if self._config_file:
+                    #     self._config_file = os.path.expanduser(self._config_file)
                 else:
-                    # calculate config file name from patch and script name
+                    # calculate config file name from path and script name
                     for path in self._config_path:
                         path = os.path.expanduser(path)
                         config = os.path.join(path, self._script + '.cfg')
@@ -75,19 +77,34 @@ class Options(object):
     def config_parser(self):
         if self._config is not None:
             if self._config_parser is None:
-                if self.config_file and os.path.isfile(self.config_file):
-                    self._config_parser = ConfigParser(self._options)
-                    self._config_parser.optionxform = str
-                    self._config_parser.read(self.config_file)
+                # if self.config_file and os.path.isfile(self.config_file):
+                self._config_parser = ConfigParser(self._options)
+                # enable case sensitive options
+                self._config_parser.optionxform = str
+                cfg_files = []
+                for file in  map(lambda f: os.path.expanduser(f), self.config_file.split(',')):
+                    if os.path.isfile(file):
+                        cfg_files.append(file)
+                self._config_parser.read(cfg_files)
         return self._config_parser
 
     @property
     def logger(self):
         if self._logger is None:
-            self._logger = logging.getLogger()
             if self.config_parser:
-                if self._config_parser.has_section('loggers'):
-                    logging.config.fileConfig(self.config_file)
+                if self.__getitem__('logconfig'):
+                    # logging config file specified in options
+                    logcfg = os.path.expanduser(self.__getitem__('logconfig'))
+                    logging.config.fileConfig(logcfg)
+                elif self._config_parser.has_section('loggers'):
+                    # get logger configuration from first(!) config file
+                    # if a 'loggers' section is found in the configuration
+                    logcfg = os.path.expanduser(self.config_file.split(',')[0])
+                    logging.config.fileConfig(logcfg)
+                else:
+                    # default config withot cfg file
+                    pass
+            self._logger = logging.getLogger()
             self._logger.setLevel(log_level(self.__getitem__('loglevel')))
         return self._logger
 
