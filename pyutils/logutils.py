@@ -31,7 +31,7 @@ class LogFileHandler(logging.FileHandler):
         logging.FileHandler.__init__(self, path, mode, endcoding)
 
 
-def get_logger(name=None, level=logging.INFO):
+def get_logger(name=None, level=None):
     """
     default console logger
     :param name: optional name of logger instance
@@ -45,7 +45,8 @@ def get_logger(name=None, level=logging.INFO):
     sh.setFormatter(sf)
 
     root = logging.getLogger(name)
-    root.setLevel(log_level(level))
+    if level is not None:
+        root.setLevel(log_level(level))
     root.addHandler(sh)
 
     return root

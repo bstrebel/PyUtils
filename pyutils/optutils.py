@@ -105,7 +105,8 @@ class Options(object):
                     # default config withot cfg file
                     pass
             self._logger = logging.getLogger()
-            self._logger.setLevel(log_level(self.__getitem__('loglevel')))
+            if self.__getitem__('loglevel'):
+                self._logger.setLevel(log_level(self.__getitem__('loglevel')))
         return self._logger
 
     def get(self, key, default=None, type=str):
