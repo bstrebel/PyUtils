@@ -64,6 +64,12 @@ def main():
 
     s = opts.get('string_option', False)
     t = opts['secrets']['token']
+    e = opts['empty']
+    b = opts.get('uni')
+    u = opts['uni']
+
+
+
     pass
     #f = Options.get_bool_value(opt)
 

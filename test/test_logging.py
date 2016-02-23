@@ -23,3 +23,9 @@ adapter = LogAdapter(root, {'package': 'pyutils'})
 
 adapter.debug('Log message')
 
+try:
+    1/0
+except Exception as e:
+    adapter.exception('Catched exception!')
+
+
