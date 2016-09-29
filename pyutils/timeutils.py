@@ -37,5 +37,4 @@ def timestamp(spec, format='%Y-%m-%d %H:%M:%S'):
     :param format: format of time string
     :return: unix timestamp (seconds) since 1970, multiply with 1000 for milliseconds
     '''
-
     return int(time.mktime(datetime.datetime.strptime(spec, format).timetuple()))
