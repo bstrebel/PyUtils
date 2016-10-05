@@ -5,7 +5,6 @@ import os, sys, logging, logging.config
 from logutils import log_level
 from ConfigParser import ConfigParser
 
-
 class Options(object):
 
     def __init__(self, options={}, args=None, config=None, config_path=['./', '~/.', '/etc/'], prefix=None):
