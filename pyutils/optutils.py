@@ -49,6 +49,28 @@ class Options(object):
     def __getattr__(self, key):
         return self.__getitem__(key)
 
+    def sections(self):
+        return self.config_parser.sections()
+
+    def keys(self, section):
+
+        # ??? contacts = dict(config.items(section))
+        # ??? dictionary contains options from multiple sections ???
+
+        # contacts = dict(config._sections[section])
+        # ??? dictionary contains __len__ and __name__ metdate ???
+
+        return {k:v for k,v in self._config_parser._sections[section].iteritems() if not k.startswith('__')}
+
+    def value(self, section, key, default=None, type=str):
+
+        # required to restore shadowed __builtin__.type()
+        import __builtin__
+        if default is not None: _type = __builtin__.type(default)
+        else:_type = type
+        val = self._config_parser.get(section, key)
+        return self.get_value(val, default, _type)
+
     @property
     def config_file(self):
         if self._config is not None:
@@ -109,17 +131,17 @@ class Options(object):
                 self._logger.setLevel(log_level(self.__getitem__('loglevel')))
         return self._logger
 
-    def get(self, key, default=None, type=str):
 
+    def get(self, key, default=None, type=str):
         # required to restore shadowed __builtin__.type()
         import __builtin__
-
-        if default is not None:
-            _type = __builtin__.type(default)
-        else:
-            _type = type
-
+        if default is not None: _type = __builtin__.type(default)
+        else:_type = type
         val = self.__getitem__(key)
+        return self.get_value(val, default, type)
+
+    @staticmethod
+    def get_value(val, default, _type):
 
         if val is not None:
 
