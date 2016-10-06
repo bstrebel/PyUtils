@@ -1,6 +1,6 @@
 import os, sys, logging
 
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 __license__ = 'GPL2'
 __author__ = 'Bernd Strebel'
 
