@@ -7,14 +7,45 @@ from ConfigParser import ConfigParser
 
 class Options(object):
 
+    """
+    Initialize Options object with default settings and command line options
+
+    Generic handler for application options from different sources. Default settings may be modified by environment
+    variables PREFIX_option, config file(s) entries with [options] section or command line arguments.
+
+    """
+
     def __init__(self, options={}, args=None, config=None, config_path=['./', '~/.', '/etc/'], prefix=None):
+
+        """
+        Initialize options handler.
+
+        In general called in main() after arg_parse. Returns Options object to transparently access options
+        and configuration settings.
+
+
+        Args:
+            options (dict): application defaults
+            args (object): command line options
+            config (str): use configuration file
+            config_path (list): search config file in path
+                default: ./configfile, ~/.configfile, /etc/configfile
+            prefix (str): prefix for environment options
+
+        Examples:
+
+
+        """
 
         self._options = options                                 # default options
         self._args = args                                       # namespace from argparser
         self._opts = vars(args) if args is not None else {}     # command line args e.g. --config=...
         self._prefix = prefix                                   # environment vars PREFEX_
-        self._config = config                                   # config filename or [key] to search in opts/vars
         self._config_path = config_path                         # config file search path
+
+        if self._opts.has_key('config'):                        # config filename or [key] to search in opts/vars
+            self._config = self._opts['config']                 # command line settings overrides default
+        else: self._config = config                             # default from definition in main()
 
         self._config_file = None
         self._config_parser = None
@@ -81,14 +112,16 @@ class Options(object):
                         self._config_file = self.__getitem__(key)
                     else:
                         self._config_file = self._config
-                    # single filename or comma separted list of names
-                    # if self._config_file:
-                    #     self._config_file = os.path.expanduser(self._config_file)
+                        # single filename or comma separted list of names
+                        # if self._config_file:
+                        #     self._config_file = os.path.expanduser(self._config_file)
                 else:
                     # calculate config file name from path and script name
                     for path in self._config_path:
                         path = os.path.expanduser(path)
-                        config = os.path.join(path, self._script + '.cfg')
+                        # config = os.path.join(path, self._script + '.cfg')
+                        config = path + self._script + '.cfg'
+
                         if os.path.isfile(config):
                             self._config_file = config
                             break
