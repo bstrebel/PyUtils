@@ -17,14 +17,20 @@ class LogAdapter(logging.LoggerAdapter):
 
 class LogFileHandler(logging.FileHandler):
     """
-    advanced FileHandler class with expanduser support
-    usage in file based logging configuration:
-        [handler_fileHandler]
-        formatter=fileFormatter
-        level=INFO
-        class=pyutils.LogFileHandler
-        args=('~/oxsync/oxsync.log', 'a')
+    Advanced FileHandler with expanduser support.
+
+    Use this class in the your logging configuration to use '~' (*expanduser*) in the logfile path specification.
+
+    Example:
+        usage in file based logging configuration::
+
+            [handler_fileHandler]
+            formatter=fileFormatter
+            level=INFO
+            class=pyutils.LogFileHandler
+            args=('~/oxsync/oxsync.log', 'a')
     """
+
     def __init__(self, path, mode='a', endcoding='utf-8'):
         import logging
         path = os.path.expanduser(path)
@@ -32,11 +38,16 @@ class LogFileHandler(logging.FileHandler):
 
 
 def get_logger(name=None, level=None):
+
     """
     default console logger
-    :param name: optional name of logger instance
-    :param level: initial log level
-    :return: the logger object
+
+    Args:
+        name (str): optional name of logger instance
+        level (int/str): initial log level
+
+    Returns:
+        the logger object
     """
 
     # stream handler configuration

@@ -11,6 +11,7 @@ from .timeutils import strflocal, localfstr
 from .optutils import Options
 from .unicode import utf8, string
 from .dynutils import import_code
+from .strutils import integer, strsplit
 
 __all__ = [
 
@@ -23,5 +24,7 @@ __all__ = [
     'utf8',
     'string',
     'Options',
-    'import_code'
+    'import_code',
+    'integer',
+    'strsplit'
 ]
