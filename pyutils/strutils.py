@@ -3,6 +3,7 @@
 
 import re
 
+
 def integer(val):
     if isinstance(val, int):
         return val
@@ -11,6 +12,6 @@ def integer(val):
             return int(val)
     return None
 
-def strsplit(str):
-    return re.findall(r"[\w']+", str)
 
+def split(str):
+    return re.findall(r"[\w']+", str)

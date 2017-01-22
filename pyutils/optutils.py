@@ -3,10 +3,10 @@
 
 import os, sys, logging, logging.config, re
 from logutils import log_level
-from ConfigParser import ConfigParser
+#from ConfigParser import ConfigParser
+import ConfigParser
 
-
-class ConfigParserEx(ConfigParser):
+class ConfigParserEx(ConfigParser.ConfigParser):
 
     """
     Extended ConfigParser
@@ -20,7 +20,7 @@ class ConfigParserEx(ConfigParser):
         """
         Pass all arguments to parent constructor
         """
-        ConfigParser.__init__(self, *args, **kwargs)
+        ConfigParser.ConfigParser.__init__(self, *args, **kwargs)
 
     def find_section(self, option, sections=None):
 
@@ -78,17 +78,17 @@ class ConfigParserEx(ConfigParser):
         => /PATH/bar
         """
 
-        value = ConfigParser.get(self, section, option, raw, vars)
-        if interpolate:
+        value = ConfigParser.ConfigParser.get(self, section, option, raw, vars)
+        if interpolate and value and isinstance(value, str):
             for reference in re.findall('\${(.+?)}', value):
                 ref = reference.split(':')
                 if len(ref) > 1:
                     if self.has_section(ref[0]) and self.has_option(ref[0], "ref[1]"):
-                        repl = ConfigParser.get(self, ref[0], ref[1])
+                        repl = ConfigParser.ConfigParser.get(self, ref[0], ref[1])
                         value = value.replace('${' + ref[0] + ':' + ref[1] + '}', repl, 1)
                 else:
                     if self.has_option(section, ref[0]):
-                        repl = ConfigParser.get(self, section, ref[0])
+                        repl = ConfigParser.ConfigParser.get(self, section, ref[0])
                         value = value.replace('${' + ref[0] + '}', repl, 1)
         return value
 
@@ -146,12 +146,26 @@ class Options(object):
 
 # region Options
     def get(self, key, default=None, type=str):
-        # required to restore shadowed __builtin__.type()
-        import __builtin__
+
+        """
+        Get value from options
+
+        Args:
+            key (str): option key to search for
+            default (str|int|float|bool): default value if not found
+            type (type): convert (string) value from config file to
+                desired type
+
+        Returns:
+            value for option key
+        """
+
+        import __builtin__  # required to restore shadowed __builtin__.type()
         if default is not None: _type = __builtin__.type(default)
-        else:_type = type
+        else: _type = type
+
         val = self.__getitem__(key)
-        return self.get_value(val, default, type)
+        return self.get_value(val, default, _type)
 
     @staticmethod
     def get_value(val, default, _type):
